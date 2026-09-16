@@ -1,10 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -14,16 +9,12 @@ using TweetBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ============ Конфигурация ============
-
 builder.Services.AddControllers(options => {
     options.Filters.Add<GlobalExceptionFilter>();
 });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// ============ DI ============
 
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<TweetStore>();
@@ -33,8 +24,6 @@ builder.Services.AddSignalR(options => {
     options.EnableDetailedErrors = true;
     options.MaximumReceiveMessageSize = 102400;
 });
-
-// ============ Rate Limiting ============
 
 builder.Services.AddRateLimiter(options => {
     options.RejectionStatusCode = 429;
@@ -132,8 +121,6 @@ builder.Services.AddRateLimiter(options => {
     });
 });
 
-// ============ Авторизация ============
-
 builder.Services.AddAuthentication("TokenAuth")
     .AddScheme<AuthenticationSchemeOptions, TokenAuthenticationHandler>("TokenAuth", null);
 
@@ -164,16 +151,12 @@ if (builder.Environment.IsDevelopment()) {
     });
 }
 
-// ============ Логирование ============
-
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 var app = builder.Build();
 
-
-// ============ Middleware ============
 
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
